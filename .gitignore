@@ -39,5 +39,5 @@ terraform.rc
 .DS_Store
 .vscode/
 *.swp
-.idea
+.idea/
 
