@@ -1,0 +1,58 @@
+# ---------------------------------------------------------
+# MAIN INGRESS (STABLE TRAFFIC)
+# This routes 100% traffic to service-v1 by default
+# ---------------------------------------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: servicewiz.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-v1
+                port:
+                  number: 80
+
+---
+
+# ---------------------------------------------------------
+# CANARY INGRESS
+# Sends a percentage of traffic to the new version
+# ---------------------------------------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-canary
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+    # Enable Canary Deployment
+    nginx.ingress.kubernetes.io/canary: "true"
+
+    # Send 20% traffic to service-v2
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+
+spec:
+  rules:
+    - host: servicewiz.in
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: service-v2
+                port:
+                  number: 80
